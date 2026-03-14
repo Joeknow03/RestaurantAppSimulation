@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ny6bJ6HuN/E=",
+  "dgSpecHash": "T1T7xpP2nnU=",
   "success": true,
   "projectFilePath": "/Users/jahongirakiljonov/RiderProjects/RestaurantAppSimulation/RestaurantAppSimulation/RestaurantAppSimulation.csproj",
   "expectedPackageFiles": [
@@ -30,7 +30,6 @@
     "/Users/jahongirakiljonov/.nuget/packages/skiasharp.nativeassets.macos/2.88.9/skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",
     "/Users/jahongirakiljonov/.nuget/packages/skiasharp.nativeassets.webassembly/2.88.9/skiasharp.nativeassets.webassembly.2.88.9.nupkg.sha512",
     "/Users/jahongirakiljonov/.nuget/packages/skiasharp.nativeassets.win32/2.88.9/skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
-    "/Users/jahongirakiljonov/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
     "/Users/jahongirakiljonov/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512"
   ],
   "logs": []

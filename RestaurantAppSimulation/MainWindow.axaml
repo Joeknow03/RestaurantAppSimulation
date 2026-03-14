@@ -1,9 +1,143 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="RestaurantAppSimulation.MainWindow"
-        Title="RestaurantAppSimulation">
-    Welcome to Avalonia!
+        Title="My Restaurant 🍳"
+        Width="480"
+        Height="580"
+        CanResize="False"
+        Background="#1E1E1E">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1D4ED8" />
+        </Style>
+        <Style Selector="RadioButton">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="12">
+
+            <!-- Title -->
+            <TextBlock Text="🍽️ My Restaurant"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Foreground="White" />
+            
+            <Border Background="#2D2D2D"
+                    CornerRadius="8"
+                    Padding="15">
+                <StackPanel Spacing="12">
+
+                    <TextBlock Text="Menu"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="White" />
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="24">
+                        <RadioButton x:Name="ChickenRadio"
+                                     Content="Chicken"
+                                     IsChecked="True"
+                                     GroupName="FoodChoice"
+                                     Foreground="White" />
+                        <RadioButton x:Name="EggRadio"
+                                     Content="Egg"
+                                     GroupName="FoodChoice"
+                                     Foreground="White" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Quantity:"
+                                   VerticalAlignment="Center"
+                                   Foreground="White" />
+                        <NumericUpDown x:Name="QuantityInput"
+                                       Value="1"
+                                       Minimum="1"
+                                       Maximum="20"
+                                       Width="110"
+                                       FormatString="0"
+                                       Background="#3D3D3D"
+                                       Foreground="White" />
+                    </StackPanel>
+                    
+                    <Button x:Name="SubmitButton"
+                            Content="📋  Submit new request"
+                            Click="SubmitButton_Click"
+                            HorizontalAlignment="Stretch"
+                            Background="#16A34A"
+                            Foreground="White" />
+                    
+                    <Button x:Name="CopyButton"
+                            Content="📋  Copy the previous request"
+                            Click="CopyButton_Click"
+                            HorizontalAlignment="Stretch"
+                            Background="#D97706"
+                            Foreground="White" />
+
+                </StackPanel>
+            </Border>
+            
+            <Border Background="#3D3000"
+                    BorderBrush="#CA8A04"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12">
+                <TextBlock x:Name="EggQualityLabel"
+                           Text="Egg Quality: -"
+                           FontSize="14"
+                           Foreground="#FDE68A" />
+            </Border>
+
+            <Button x:Name="PrepareButton"
+                    Content="Prepare Food"
+                    Click="PrepareButton_Click"
+                    HorizontalAlignment="Stretch"
+                    FontSize="15"
+                    FontWeight="Bold"
+                    Background="#DC2626"
+                    Foreground="White"
+                    Padding="12,10" />
+
+            <Button x:Name="ClearButton"
+                    Content="🗑️  Clear Results"
+                    Click="ClearButton_Click"
+                    HorizontalAlignment="Right"
+                    Background="#4B5563"
+                    Foreground="White" />
+
+            <TextBlock Text="Results:"
+                       FontWeight="Bold"
+                       Foreground="White" />
+
+            <TextBox x:Name="ResultsBox"
+                     IsReadOnly="True"
+                     Height="160"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     FontFamily="Courier New"
+                     FontSize="12"
+                     Background="#2D2D2D"
+                     Foreground="#D1FAE5"
+                     BorderBrush="#4B5563"
+                     BorderThickness="1"
+                     Padding="8" />
+
+        </StackPanel>
+    </ScrollViewer>
+
 </Window>

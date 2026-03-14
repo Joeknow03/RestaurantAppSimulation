@@ -2,7 +2,7 @@ using System;
 
 namespace RestaurantAppSimulation;
 
-public class Emplyee
+public class Employee
 {
     private object? lastOrder = null;
     private int requestCount = 0;
