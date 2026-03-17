@@ -2,23 +2,26 @@ using System;
 
 namespace RestaurantAppSimulation;
 
-public class EggOrder
+public class EggOrder : Order
 {
-    private int quantity;
     private int qualityValue;
-    
     private static Random sharedRandom = new Random();
-    
-    private static int totalEggOrdersCreated = 0;
+    private static int totalCreated = 0;
     private int myInstanceNumber;
  
     // Constructor: takes how many eggs to order
-    public EggOrder(int quantity)
+    public EggOrder(int quantity) : base(quantity)
     {
-        this.quantity = quantity;
-        totalEggOrdersCreated++;
-        myInstanceNumber = totalEggOrdersCreated;
+        totalCreated++;
+        myInstanceNumber = totalCreated;
         qualityValue = sharedRandom.Next(1, 101);
+    }
+    
+    public EggOrder(int quantity, int quality) : base(quantity)
+    {
+        totalCreated++;
+        myInstanceNumber = totalCreated;
+        qualityValue = quality;
     }
     
     public int GetQuantity()
@@ -51,7 +54,7 @@ public class EggOrder
         // Throw away the shell
     }
     
-    public void Cook()
+    public override void Cook()
     {
         // Cook everything together
     }

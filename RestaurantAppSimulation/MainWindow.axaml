@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="RestaurantAppSimulation.MainWindow"
         Title="My Restaurant 🍳"
-        Width="480"
-        Height="580"
+        Width="500"
+        Height="640"
         CanResize="False"
         Background="#1E1E1E">
 
@@ -21,75 +21,95 @@
         </Style>
         <Style Selector="RadioButton">
             <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13" />
         </Style>
         <Style Selector="TextBlock">
             <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="#3D3D3D" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#4B5563" />
         </Style>
     </Window.Styles>
 
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="12">
-
-            <!-- Title -->
             <TextBlock Text="🍽️ My Restaurant"
                        FontSize="26"
                        FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       Foreground="White" />
+                       HorizontalAlignment="Center" />
             
-            <Border Background="#2D2D2D"
-                    CornerRadius="8"
-                    Padding="15">
-                <StackPanel Spacing="12">
+            <Border Background="#2D2D2D" CornerRadius="8" Padding="15">
+                <StackPanel Spacing="10">
 
-                    <TextBlock Text="Menu"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Foreground="White" />
-                    
-                    <StackPanel Orientation="Horizontal" Spacing="24">
-                        <RadioButton x:Name="ChickenRadio"
-                                     Content="Chicken"
-                                     IsChecked="True"
-                                     GroupName="FoodChoice"
-                                     Foreground="White" />
-                        <RadioButton x:Name="EggRadio"
-                                     Content="Egg"
-                                     GroupName="FoodChoice"
-                                     Foreground="White" />
-                    </StackPanel>
-                    
+                    <TextBlock Text="Receive this request from a Customer"
+                               FontSize="15"
+                               FontWeight="Bold" />
+
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="Quantity:"
+                        <TextBlock Text="How many chicken?"
                                    VerticalAlignment="Center"
-                                   Foreground="White" />
-                        <NumericUpDown x:Name="QuantityInput"
-                                       Value="1"
-                                       Minimum="1"
+                                   Width="160" />
+                        <NumericUpDown x:Name="ChickenQty"
+                                       Value="0"
+                                       Minimum="0"
                                        Maximum="20"
-                                       Width="110"
+                                       Width="100"
                                        FormatString="0"
                                        Background="#3D3D3D"
                                        Foreground="White" />
                     </StackPanel>
                     
-                    <Button x:Name="SubmitButton"
-                            Content="📋  Submit new request"
-                            Click="SubmitButton_Click"
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="How many egg?"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <NumericUpDown x:Name="EggQty"
+                                       Value="0"
+                                       Minimum="0"
+                                       Maximum="20"
+                                       Width="100"
+                                       FormatString="0"
+                                       Background="#3D3D3D"
+                                       Foreground="White" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Drink:"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <ComboBox x:Name="DrinkCombo"
+                                  SelectedIndex="0"
+                                  Width="150">
+                            <ComboBoxItem Content="Tea" />
+                            <ComboBoxItem Content="Coca Cola" />
+                            <ComboBoxItem Content="Pepsi" />
+                            <ComboBoxItem Content="No drink" />
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <Button x:Name="ReceiveButton"
+                            Content="➕  Receive request from Customer"
+                            Click="ReceiveButton_Click"
                             HorizontalAlignment="Stretch"
                             Background="#16A34A"
                             Foreground="White" />
                     
-                    <Button x:Name="CopyButton"
-                            Content="📋  Copy the previous request"
-                            Click="CopyButton_Click"
-                            HorizontalAlignment="Stretch"
-                            Background="#D97706"
-                            Foreground="White" />
+                    <TextBlock x:Name="CustomerCountLabel"
+                               Text="Customers at table: 0 / 8"
+                               Foreground="#9CA3AF" />
 
                 </StackPanel>
             </Border>
+            
+            <Button x:Name="SendButton"
+                    Content="📨  Send all Customer requests to the Cook"
+                    Click="SendButton_Click"
+                    HorizontalAlignment="Stretch"
+                    Background="#D97706"
+                    Foreground="White"
+                    FontSize="14" />
             
             <Border Background="#3D3000"
                     BorderBrush="#CA8A04"
@@ -98,34 +118,31 @@
                     Padding="12">
                 <TextBlock x:Name="EggQualityLabel"
                            Text="Egg Quality: -"
-                           FontSize="14"
+                           FontSize="13"
                            Foreground="#FDE68A" />
             </Border>
-
-            <Button x:Name="PrepareButton"
-                    Content="Prepare Food"
-                    Click="PrepareButton_Click"
+            
+            <Button x:Name="ServeButton"
+                    Content="🍽️  Serve prepared food to the Customers"
+                    Click="ServeButton_Click"
                     HorizontalAlignment="Stretch"
-                    FontSize="15"
-                    FontWeight="Bold"
-                    Background="#DC2626"
+                    Background="#7C3AED"
                     Foreground="White"
-                    Padding="12,10" />
-
+                    FontSize="14" />
+            
             <Button x:Name="ClearButton"
                     Content="🗑️  Clear Results"
                     Click="ClearButton_Click"
                     HorizontalAlignment="Right"
                     Background="#4B5563"
                     Foreground="White" />
-
+            
             <TextBlock Text="Results:"
-                       FontWeight="Bold"
-                       Foreground="White" />
+                       FontWeight="Bold" />
 
             <TextBox x:Name="ResultsBox"
                      IsReadOnly="True"
-                     Height="160"
+                     Height="180"
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
