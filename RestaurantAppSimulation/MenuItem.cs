@@ -1,11 +1,9 @@
+using System;
 namespace RestaurantAppSimulation;
 
-public enum MenuItem
+public abstract class MenuItem : IMenuItem
 {
-    Chicken,
-    Egg,
-    Tea,
-    CocaCola,
-    Pepsi,
-    NoDrink
+    public string Name { get; protected set; } = "Unknown";
+    public abstract void Obtain();
+    public abstract void Serve();
 }

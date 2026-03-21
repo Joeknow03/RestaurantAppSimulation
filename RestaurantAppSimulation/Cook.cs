@@ -4,53 +4,57 @@ namespace RestaurantAppSimulation;
 
 public class Cook
 {
-    public ChickenOrder SubmitChicken(int quantity)
+    public string Process(TableRequests requests)
     {
-        return new ChickenOrder(quantity);
-    }
+        string result = "";
+        IMenuItem[] chickens = requests[new Chicken()];
  
-    // Submit an egg request
-    public EggOrder SubmitEgg(int quantity)
-    {
-        return new EggOrder(quantity);
-    }
- 
-    // Prepare all the chicken
-    public string PrepareChicken(ChickenOrder order)
-    {
-        int qty = order.GetQuantity();
-        for (int i = 0; i < qty; i++)
+        if (chickens.Length > 0)
         {
-            order.CutUp();
+            result += "Processing " + chickens.Length + " chicken(s)...\n";
+ 
+            for (int i = 0; i < chickens.Length; i++)
+            {
+                Chicken chicken = (Chicken)chickens[i];
+                chicken.Obtain();
+                chicken.CutUp();
+                chicken.Cook();
+            }
+ 
+            result += "All chicken prepared.\n";
         }
-        order.Cook();
+        
+        IMenuItem[] eggs = requests[new Egg()];
  
-        return "Prepared " + qty + " chicken.";
-    }
-    
-    public string PrepareEgg(EggOrder order)
-    {
-        int qty = order.GetQuantity();
-        int rottenCount = 0;
- 
-        for (int i = 0; i < qty; i++)
+        if (eggs.Length > 0)
         {
-            try
-            {
-                order.Crack();
-            }
-            catch (Exception)
-            {
-                rottenCount++;
-            }
-            finally
-            {
-                // Always discard shell
-                order.DiscardShell();
-            }
-        }
-        order.Cook();
+            result += "Processing " + eggs.Length + " egg(s)...\n";
+            int rottenCount = 0;
  
-        return "Prepared " + qty + " egg(s). Rotten eggs found: " + rottenCount + ".";
+            for (int i = 0; i < eggs.Length; i++)
+            {
+                Egg egg = (Egg)eggs[i];
+                egg.Obtain();
+                
+                using (egg)
+                {
+                    try
+                    {
+                        egg.Crack();
+                        egg.Cook();
+                    }
+                    catch (Exception)
+                    {
+                        // counting rotten egg and continue
+                        rottenCount++;
+                    }
+                    
+                }
+            }
+ 
+            result += "All eggs prepared. Rotten eggs found: " + rottenCount + "\n";
+        }
+        
+        return result;
     }
 }

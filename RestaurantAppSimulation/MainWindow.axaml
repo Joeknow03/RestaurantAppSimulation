@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="RestaurantAppSimulation.MainWindow"
-        Title="My Restaurant 🍳"
+        Title="My Restaurant"
         Width="500"
         Height="640"
         CanResize="False"
@@ -35,7 +35,9 @@
 
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="12">
-            <TextBlock Text="🍽️ My Restaurant"
+
+            <!-- Title -->
+            <TextBlock Text="My Restaurant"
                        FontSize="26"
                        FontWeight="Bold"
                        HorizontalAlignment="Center" />
@@ -47,6 +49,22 @@
                                FontSize="15"
                                FontWeight="Bold" />
 
+                    <!-- Customer number -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Customer number:"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <NumericUpDown x:Name="CustomerNumber"
+                                       Value="0"
+                                       Minimum="0"
+                                       Maximum="7"
+                                       Width="100"
+                                       FormatString="0"
+                                       Background="#3D3D3D"
+                                       Foreground="White" />
+                    </StackPanel>
+
+                    <!-- Chicken quantity -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="How many chicken?"
                                    VerticalAlignment="Center"
@@ -60,7 +78,8 @@
                                        Background="#3D3D3D"
                                        Foreground="White" />
                     </StackPanel>
-                    
+
+                    <!-- Egg quantity -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="How many egg?"
                                    VerticalAlignment="Center"
@@ -74,7 +93,8 @@
                                        Background="#3D3D3D"
                                        Foreground="White" />
                     </StackPanel>
-                    
+
+                    <!-- Drink choice -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="Drink:"
                                    VerticalAlignment="Center"
@@ -88,16 +108,17 @@
                             <ComboBoxItem Content="No drink" />
                         </ComboBox>
                     </StackPanel>
-                    
+
+                    <!-- Receive button -->
                     <Button x:Name="ReceiveButton"
                             Content="➕  Receive request from Customer"
                             Click="ReceiveButton_Click"
                             HorizontalAlignment="Stretch"
                             Background="#16A34A"
                             Foreground="White" />
-                    
+
                     <TextBlock x:Name="CustomerCountLabel"
-                               Text="Customers at table: 0 / 8"
+                               Text="Customers at table: 0"
                                Foreground="#9CA3AF" />
 
                 </StackPanel>
@@ -123,22 +144,23 @@
             </Border>
             
             <Button x:Name="ServeButton"
-                    Content="🍽️  Serve prepared food to the Customers"
+                    Content="Serve prepared food to the Customers"
                     Click="ServeButton_Click"
                     HorizontalAlignment="Stretch"
                     Background="#7C3AED"
                     Foreground="White"
                     FontSize="14" />
-            
+
+            <!-- Clear button -->
             <Button x:Name="ClearButton"
                     Content="🗑️  Clear Results"
                     Click="ClearButton_Click"
                     HorizontalAlignment="Right"
                     Background="#4B5563"
                     Foreground="White" />
-            
-            <TextBlock Text="Results:"
-                       FontWeight="Bold" />
+
+            <!-- Results -->
+            <TextBlock Text="Results:" FontWeight="Bold" />
 
             <TextBox x:Name="ResultsBox"
                      IsReadOnly="True"

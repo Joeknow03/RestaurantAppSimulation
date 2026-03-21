@@ -6,8 +6,7 @@ namespace RestaurantAppSimulation;
 
 public partial class MainWindow : Window
 {
-    private Server server = new Server();
-    private bool foodSentToCook = false;
+    private Server _server = new Server();
 
     public MainWindow()
     {
@@ -18,19 +17,32 @@ public partial class MainWindow : Window
     {
         try
         {
+            int customerNumber = (int)(CustomerNumber.Value ?? 0);
             int chickenQty = (int)(ChickenQty.Value ?? 0);
             int eggQty = (int)(EggQty.Value ?? 0);
+            string drinkChoice = GetSelectedDrink();
 
-            MenuItem drink = GetSelectedDrink();
-
-            string result = server.Receive(chickenQty, eggQty, drink);
+            string result = _server.Receive(customerNumber, chickenQty, eggQty, drinkChoice);
             AddToResults(result);
 
-            CustomerCountLabel.Text = "Customers at table: " + server.GetCustomerCount() + " / 8";
+            CustomerCountLabel.Text = "Customers at table: " + _server.GetCustomerCount();
 
+            // Reset inputs for next customer
             ChickenQty.Value = 0;
             EggQty.Value = 0;
             DrinkCombo.SelectedIndex = 0;
+
+            // Increment customer number for convenience
+            if (CustomerNumber.Value < 7)
+            {
+                CustomerNumber.Value++;
+            }
+
+            // Show egg quality info if eggs were ordered
+            if (eggQty > 0)
+            {
+                EggQualityLabel.Text = "Egg Quality: check results (some may be hidden)";
+            }
         }
         catch (Exception ex)
         {
@@ -42,18 +54,16 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (server.GetCustomerCount() == 0)
+            if (_server.GetCustomerCount() == 0)
             {
                 AddToResults("No customers have ordered yet!");
                 return;
             }
 
-            AddToResults("--- Sending orders to Cook ---");
-            string result = server.Send();
+            string result = _server.Send();
             AddToResults(result);
 
-            foodSentToCook = true;
-            EggQualityLabel.Text = "Egg Quality: food is being prepared by Cook...";
+            EggQualityLabel.Text = "Egg Quality: food prepared by Cook";
         }
         catch (Exception ex)
         {
@@ -65,20 +75,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (!foodSentToCook)
-            {
-                AddToResults("Food hasn't been sent to the Cook yet!");
-                return;
-            }
-
             AddToResults("--- Serving food ---");
-            string result = server.Serve();
+            string result = _server.Serve();
             AddToResults(result);
             AddToResults("");
 
-            foodSentToCook = false;
-            CustomerCountLabel.Text = "Customers at table: 0 / 8";
+            CustomerCountLabel.Text = "Customers at table: 0";
             EggQualityLabel.Text = "Egg Quality: -";
+            CustomerNumber.Value = 0;
         }
         catch (Exception ex)
         {
@@ -91,14 +95,14 @@ public partial class MainWindow : Window
         ResultsBox.Text = "";
     }
 
-    private MenuItem GetSelectedDrink()
+    private string GetSelectedDrink()
     {
         switch (DrinkCombo.SelectedIndex)
         {
-            case 0: return MenuItem.Tea;
-            case 1: return MenuItem.CocaCola;
-            case 2: return MenuItem.Pepsi;
-            default: return MenuItem.NoDrink;
+            case 0: return "Tea";
+            case 1: return "Coca Cola";
+            case 2: return "Pepsi";
+            default: return "No drink";
         }
     }
 

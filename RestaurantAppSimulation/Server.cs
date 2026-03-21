@@ -3,149 +3,99 @@ namespace RestaurantAppSimulation;
 
 public class Server
 {
-    // Max 8 customers per table
-    private const int MaxCustomers = 8;
-    private int customerCount = 0;
-    private MenuItem[][] requests = new MenuItem[MaxCustomers][];
-    
-    private Cook cook = new Cook();
-    
-    private ChickenOrder? preparedChicken = null;
-    private EggOrder? preparedEgg = null;
-    
-    public string Receive(int chickenQty, int eggQty, MenuItem drink)
+    private TableRequests _tableRequests = new TableRequests();
+    private Cook _cook = new Cook();
+    private bool _foodPrepared = false;
+    public string Receive(int customerNumber, int chickenQty, int eggQty, string drinkChoice)
     {
-        if (customerCount >= MaxCustomers)
-        {
-            return "Sorry, table is full! Max " + MaxCustomers + " customers.";
-        }
-        
-        int totalItems = chickenQty + eggQty + 1;
-        MenuItem[] customerOrder = new MenuItem[totalItems];
- 
-        int index = 0;
- 
-        // Add chicken items
         for (int i = 0; i < chickenQty; i++)
         {
-            customerOrder[index] = MenuItem.Chicken;
-            index++;
+            _tableRequests.Add(customerNumber, new Chicken());
         }
- 
-        // Add egg items
+        
         for (int i = 0; i < eggQty; i++)
         {
-            customerOrder[index] = MenuItem.Egg;
-            index++;
+            _tableRequests.Add(customerNumber, new Egg());
         }
+        
+        if (drinkChoice == "Tea")
+        {
+            _tableRequests.Add(customerNumber, new Tea());
+        }
+        else if (drinkChoice == "Coca Cola")
+        {
+            _tableRequests.Add(customerNumber, new CocaCola());
+        }
+        else if (drinkChoice == "Pepsi")
+        {
+            _tableRequests.Add(customerNumber, new Pepsi());
+        }
+        // if "No drink" then we add nothing
  
-        // Add drink 
-        customerOrder[index] = drink;
- 
-        // Store customer's order in the jagged array
-        requests[customerCount] = customerOrder;
-        customerCount++;
- 
-        return "✅ Recorded order for Customer " + (customerCount - 1) +
-               ": " + chickenQty + " chicken, " + eggQty + " egg, " + drink;
+        string drinkDisplay = drinkChoice == "No drink" ? "no drink" : drinkChoice;
+        return "Customer " + customerNumber + ": " +
+               chickenQty + " chicken, " + eggQty + " egg, " + drinkDisplay;
     }
     
     public string Send()
     {
-        int totalChicken = 0;
-        int totalEgg = 0;
- 
-        for (int c = 0; c < customerCount; c++)
-        {
-            for (int i = 0; i < requests[c].Length; i++)
-            {
-                if (requests[c][i] == MenuItem.Chicken)
-                {
-                    totalChicken++;
-                }
-                else if (requests[c][i] == MenuItem.Egg)
-                {
-                    totalEgg++;
-                }
-            }
-        }
- 
-        string result = "Sending to Cook: " + totalChicken + " chicken, " + totalEgg + " egg\n";
-        
-        if (totalChicken > 0)
-        {
-            preparedChicken = cook.SubmitChicken(totalChicken);
-            result += cook.PrepareChicken(preparedChicken) + "\n";
-        }
-        
-        if (totalEgg > 0)
-        {
-            preparedEgg = cook.SubmitEgg(totalEgg);
-            result += cook.PrepareEgg(preparedEgg) + "\n";
-        }
- 
+        string result = "--- Sending all requests to Cook ---\n";
+        result += _cook.Process(_tableRequests);
+        _foodPrepared = true;
         return result;
     }
     
     public string Serve()
     {
+        if (!_foodPrepared)
+        {
+            return "Food hasn't been sent to Cook yet!";
+        }
+ 
         string result = "";
+        int customerCount = _tableRequests.CustomerCount;
  
         for (int c = 0; c < customerCount; c++)
         {
-            int customerChicken = 0;
-            int customerEgg = 0;
-            MenuItem customerDrink = MenuItem.NoDrink;
+            IMenuItem[] items = _tableRequests[c];
  
-            for (int i = 0; i < requests[c].Length; i++)
+            int chickenCount = 0;
+            int eggCount = 0;
+            string drinkName = "no drink";
+ 
+            for (int i = 0; i < items.Length; i++)
             {
-                if (requests[c][i] == MenuItem.Chicken)
+                if (items[i] is Chicken)
                 {
-                    customerChicken++;
+                    chickenCount++;
                 }
-                else if (requests[c][i] == MenuItem.Egg)
+                else if (items[i] is Egg)
                 {
-                    customerEgg++;
+                    eggCount++;
                 }
-                else
+                else if (items[i] is Drink)
                 {
-                    customerDrink = requests[c][i];
+                    items[i].Obtain();
+                    drinkName = items[i].Name;
                 }
-            }
-            
-            string drinkName;
-            if (customerDrink == MenuItem.NoDrink)
-            {
-                drinkName = "no drink";
-            }
-            else if (customerDrink == MenuItem.CocaCola)
-            {
-                drinkName = "Coca Cola";
-            }
-            else
-            {
-                drinkName = customerDrink.ToString();  
             }
  
             result += "Customer " + c + " is served " +
-                      customerChicken + " chicken, " +
-                      customerEgg + " egg, " +
+                      chickenCount + " chicken, " +
+                      eggCount + " egg, " +
                       drinkName + "\n";
         }
  
         result += "Please enjoy your food!";
- 
-        // Reset for next table
-        customerCount = 0;
-        requests = new MenuItem[MaxCustomers][];
-        preparedChicken = null;
-        preparedEgg = null;
+        
+        _tableRequests = new TableRequests();
+        _foodPrepared = false;
  
         return result;
     }
-    
+ 
     public int GetCustomerCount()
     {
-        return customerCount;
+        return _tableRequests.CustomerCount;
     }
 }
