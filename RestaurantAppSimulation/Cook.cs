@@ -1,21 +1,38 @@
 using System;
+using System.Collections.Generic;
 
 namespace RestaurantAppSimulation;
 
 public class Cook
 {
+    public event EventHandler? Processed;
+    private TableRequests? _currentRequests = null;
+    
+    public string OnServerReady(object? sender, EventArgs e)
+    {
+        if (_currentRequests == null)
+            return "No requests to process!";
+ 
+        return Process(_currentRequests);
+    }
+    public void SetRequests(TableRequests requests)
+    {
+        _currentRequests = requests;
+    }
+    
     public string Process(TableRequests requests)
     {
         string result = "";
-        IMenuItem[] chickens = requests[new Chicken()];
  
-        if (chickens.Length > 0)
+        // ---- Process all Chickens ----
+        List<Chicken> chickens = requests.Get<Chicken>();
+ 
+        if (chickens.Count > 0)
         {
-            result += "Processing " + chickens.Length + " chicken(s)...\n";
+            result += "Processing " + chickens.Count + " chicken(s)...\n";
  
-            for (int i = 0; i < chickens.Length; i++)
+            foreach (Chicken chicken in chickens)
             {
-                Chicken chicken = (Chicken)chickens[i];
                 chicken.Obtain();
                 chicken.CutUp();
                 chicken.Cook();
@@ -23,19 +40,18 @@ public class Cook
  
             result += "All chicken prepared.\n";
         }
-        
-        IMenuItem[] eggs = requests[new Egg()];
  
-        if (eggs.Length > 0)
+        // ---- Process all Eggs ----
+        List<Egg> eggs = requests.Get<Egg>();
+ 
+        if (eggs.Count > 0)
         {
-            result += "Processing " + eggs.Length + " egg(s)...\n";
+            result += "Processing " + eggs.Count + " egg(s)...\n";
             int rottenCount = 0;
  
-            for (int i = 0; i < eggs.Length; i++)
+            foreach (Egg egg in eggs)
             {
-                Egg egg = (Egg)eggs[i];
                 egg.Obtain();
-                
                 using (egg)
                 {
                     try
@@ -45,16 +61,16 @@ public class Cook
                     }
                     catch (Exception)
                     {
-                        // counting rotten egg and continue
                         rottenCount++;
                     }
-                    
                 }
             }
  
-            result += "All eggs prepared. Rotten eggs found: " + rottenCount + "\n";
+            result += "All eggs prepared. Rotten: " + rottenCount + "\n";
         }
         
+        Processed?.Invoke(this, EventArgs.Empty);
+ 
         return result;
     }
 }

@@ -17,26 +17,27 @@ public partial class MainWindow : Window
     {
         try
         {
-            int customerNumber = (int)(CustomerNumber.Value ?? 0);
+            string customerName = CustomerNameInput.Text?.Trim() ?? "";
+            if (customerName == "")
+            {
+                AddToResults("Please enter a customer name!");
+                return;
+            }
             int chickenQty = (int)(ChickenQty.Value ?? 0);
             int eggQty = (int)(EggQty.Value ?? 0);
             string drinkChoice = GetSelectedDrink();
 
-            string result = _server.Receive(customerNumber, chickenQty, eggQty, drinkChoice);
+            string result = _server.Receive(customerName, chickenQty, eggQty, drinkChoice);
             AddToResults(result);
 
             CustomerCountLabel.Text = "Customers at table: " + _server.GetCustomerCount();
 
-            // Reset inputs for next customer
+            // Reset inputs
+            CustomerNameInput.Text = "";
             ChickenQty.Value = 0;
             EggQty.Value = 0;
             DrinkCombo.SelectedIndex = 0;
-
-            // Increment customer number for convenience
-            if (CustomerNumber.Value < 7)
-            {
-                CustomerNumber.Value++;
-            }
+            
 
             // Show egg quality info if eggs were ordered
             if (eggQty > 0)
@@ -59,30 +60,17 @@ public partial class MainWindow : Window
                 AddToResults("No customers have ordered yet!");
                 return;
             }
+            
+            AddToResults("--- Sending to Cook (event chain starts) ---");
+             _server.Send();
 
-            string result = _server.Send();
-            AddToResults(result);
+             AddToResults(_server.LastCookResult);
+             AddToResults("--- Serving food (triggered by Cook.Processed event) ---");
+             AddToResults(_server.LastServeResult);
+             AddToResults("");
 
-            EggQualityLabel.Text = "Egg Quality: food prepared by Cook";
-        }
-        catch (Exception ex)
-        {
-            AddToResults("ERROR: " + ex.Message);
-        }
-    }
-
-    private void ServeButton_Click(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            AddToResults("--- Serving food ---");
-            string result = _server.Serve();
-            AddToResults(result);
-            AddToResults("");
-
-            CustomerCountLabel.Text = "Customers at table: 0";
-            EggQualityLabel.Text = "Egg Quality: -";
-            CustomerNumber.Value = 0;
+             CustomerCountLabel.Text = "Customers at table: 0";
+             EggQualityLabel.Text = "Egg Quality: -";
         }
         catch (Exception ex)
         {

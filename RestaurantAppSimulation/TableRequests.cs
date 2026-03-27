@@ -1,84 +1,83 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace RestaurantAppSimulation;
 
-public class TableRequests
+public class TableRequests : IEnumerable<IMenuItem>
 {
-    private const int MaxCustomers = 8;
-    private const int MaxItemsPerCustomer = 30;
-    private IMenuItem[][] _requests = new IMenuItem[MaxCustomers][]; // jagged array
-    private int[] _itemCounts = new int[MaxCustomers];
-    private int _customerCount = 0;
     
-    public void Add(int customer, IMenuItem item)
+    private Dictionary<string, List<IMenuItem>> _orders 
+        = new Dictionary<string, List<IMenuItem>>();
+    private List<string> _customerOrder = new List<string>();
+    
+    public void Add<T>(string customerName) where T : IMenuItem, new()
     {
-        if (_requests[customer] == null)
+        // If this customer doesn't have a list yet, create one
+        if (!_orders.ContainsKey(customerName))
         {
-            _requests[customer] = new IMenuItem[MaxItemsPerCustomer];
-            if (customer + 1 > _customerCount)
-            {
-                _customerCount = customer + 1;
-            }
+            _orders[customerName] = new List<IMenuItem>();
+            _customerOrder.Add(customerName); // remember insertion order
         }
-        _requests[customer][_itemCounts[customer]] = item;
-        _itemCounts[customer]++;
+        _orders[customerName].Add(new T());
     }
     
-    public IMenuItem[] this[IMenuItem item]
+    public List<T> Get<T>() where T : IMenuItem
     {
-        get
+        List<T> result = new List<T>();
+        
+        foreach (string customerName in _customerOrder)
         {
-            System.Type targetType = item.GetType();
-            int count = 0;
-            for (int c = 0; c < MaxCustomers; c++)
+            foreach (IMenuItem item in _orders[customerName])
             {
-                if (_requests[c] == null) continue;
-                for (int i = 0; i < _itemCounts[c]; i++)
+                if (item is T typedItem)
                 {
-                    if (_requests[c][i].GetType() == targetType)
-                    {
-                        count++;
-                    }
+                    result.Add(typedItem);
                 }
             }
-            
-            IMenuItem[] result = new IMenuItem[count];
-            int index = 0;
-            for (int c = 0; c < MaxCustomers; c++)
-            {
-                if (_requests[c] == null) continue;
-                for (int i = 0; i < _itemCounts[c]; i++)
-                {
-                    if (_requests[c][i].GetType() == targetType)
-                    {
-                        result[index] = _requests[c][i];
-                        index++;
-                    }
-                }
-            }
+        }
  
-            return result;
-        }
+        return result;
     }
     
-    public IMenuItem[] this[int customer]
+    public List<IMenuItem> this[string customerName]
     {
         get
         {
-            if (_requests[customer] == null)
+            if (_orders.ContainsKey(customerName))
             {
-                return new IMenuItem[0];
+                return _orders[customerName];
             }
-            IMenuItem[] result = new IMenuItem[_itemCounts[customer]];
-            for (int i = 0; i < _itemCounts[customer]; i++)
-            {
-                result[i] = _requests[customer][i];
-            }
-            return result;
+            return new List<IMenuItem>(); // empty list if customer not found
         }
     }
-
-    public int CustomerCount
+    
+    public int CustomerCount => _customerOrder.Count;
+    public List<string> CustomerNames => _customerOrder;
+    public IEnumerator<IMenuItem> GetEnumerator()
     {
-        get { return _customerCount; }
+        foreach (string customerName in _customerOrder)
+        {
+            foreach (IMenuItem item in _orders[customerName])
+            {
+                if (item is Drink)
+                {
+                    yield return item; 
+                }
+            }
+        }
+        
+        foreach (string customerName in _customerOrder)
+        {
+            foreach (IMenuItem item in _orders[customerName])
+            {
+                if (item is not Drink)
+                {
+                    yield return item;
+                }
+            }
+        }
     }
+    
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

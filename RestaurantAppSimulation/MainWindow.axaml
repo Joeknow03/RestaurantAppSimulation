@@ -36,8 +36,8 @@
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="12">
 
-            <!-- Title -->
-            <TextBlock Text="My Restaurant"
+            
+            <TextBlock Text="🍽️ My Restaurant"
                        FontSize="26"
                        FontWeight="Bold"
                        HorizontalAlignment="Center" />
@@ -48,23 +48,18 @@
                     <TextBlock Text="Receive this request from a Customer"
                                FontSize="15"
                                FontWeight="Bold" />
-
-                    <!-- Customer number -->
+                    
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="Customer number:"
+                        <TextBlock Text="Customer name:"
                                    VerticalAlignment="Center"
                                    Width="160" />
-                        <NumericUpDown x:Name="CustomerNumber"
-                                       Value="0"
-                                       Minimum="0"
-                                       Maximum="7"
-                                       Width="100"
-                                       FormatString="0"
-                                       Background="#3D3D3D"
-                                       Foreground="White" />
+                        <TextBox x:Name="CustomerNameInput"
+                                 Width="180"
+                                 Watermark="e.g. Dilshod"
+                                 Background="#3D3D3D"
+                                 Foreground="White" />
                     </StackPanel>
-
-                    <!-- Chicken quantity -->
+                    
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="How many chicken?"
                                    VerticalAlignment="Center"
@@ -142,14 +137,6 @@
                            FontSize="13"
                            Foreground="#FDE68A" />
             </Border>
-            
-            <Button x:Name="ServeButton"
-                    Content="Serve prepared food to the Customers"
-                    Click="ServeButton_Click"
-                    HorizontalAlignment="Stretch"
-                    Background="#7C3AED"
-                    Foreground="White"
-                    FontSize="14" />
 
             <!-- Clear button -->
             <Button x:Name="ClearButton"
@@ -164,7 +151,7 @@
 
             <TextBox x:Name="ResultsBox"
                      IsReadOnly="True"
-                     Height="180"
+                     Height="200"
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
