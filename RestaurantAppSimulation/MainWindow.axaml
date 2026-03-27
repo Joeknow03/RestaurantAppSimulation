@@ -1,0 +1,169 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="RestaurantAppSimulation.MainWindow"
+        Title="My Restaurant"
+        Width="500"
+        Height="640"
+        CanResize="False"
+        Background="#1E1E1E">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1D4ED8" />
+        </Style>
+        <Style Selector="RadioButton">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="#3D3D3D" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#4B5563" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="12">
+
+            
+            <TextBlock Text="🍽️ My Restaurant"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center" />
+            
+            <Border Background="#2D2D2D" CornerRadius="8" Padding="15">
+                <StackPanel Spacing="10">
+
+                    <TextBlock Text="Receive this request from a Customer"
+                               FontSize="15"
+                               FontWeight="Bold" />
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Customer name:"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <TextBox x:Name="CustomerNameInput"
+                                 Width="180"
+                                 Watermark="e.g. Dilshod"
+                                 Background="#3D3D3D"
+                                 Foreground="White" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="How many chicken?"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <NumericUpDown x:Name="ChickenQty"
+                                       Value="0"
+                                       Minimum="0"
+                                       Maximum="20"
+                                       Width="100"
+                                       FormatString="0"
+                                       Background="#3D3D3D"
+                                       Foreground="White" />
+                    </StackPanel>
+
+                    <!-- Egg quantity -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="How many egg?"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <NumericUpDown x:Name="EggQty"
+                                       Value="0"
+                                       Minimum="0"
+                                       Maximum="20"
+                                       Width="100"
+                                       FormatString="0"
+                                       Background="#3D3D3D"
+                                       Foreground="White" />
+                    </StackPanel>
+
+                    <!-- Drink choice -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Drink:"
+                                   VerticalAlignment="Center"
+                                   Width="160" />
+                        <ComboBox x:Name="DrinkCombo"
+                                  SelectedIndex="0"
+                                  Width="150">
+                            <ComboBoxItem Content="Tea" />
+                            <ComboBoxItem Content="Coca Cola" />
+                            <ComboBoxItem Content="Pepsi" />
+                            <ComboBoxItem Content="No drink" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Receive button -->
+                    <Button x:Name="ReceiveButton"
+                            Content="➕  Receive request from Customer"
+                            Click="ReceiveButton_Click"
+                            HorizontalAlignment="Stretch"
+                            Background="#16A34A"
+                            Foreground="White" />
+
+                    <TextBlock x:Name="CustomerCountLabel"
+                               Text="Customers at table: 0"
+                               Foreground="#9CA3AF" />
+
+                </StackPanel>
+            </Border>
+            
+            <Button x:Name="SendButton"
+                    Content="📨  Send all Customer requests to the Cook"
+                    Click="SendButton_Click"
+                    HorizontalAlignment="Stretch"
+                    Background="#D97706"
+                    Foreground="White"
+                    FontSize="14" />
+            
+            <Border Background="#3D3000"
+                    BorderBrush="#CA8A04"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12">
+                <TextBlock x:Name="EggQualityLabel"
+                           Text="Egg Quality: -"
+                           FontSize="13"
+                           Foreground="#FDE68A" />
+            </Border>
+
+            <!-- Clear button -->
+            <Button x:Name="ClearButton"
+                    Content="🗑️  Clear Results"
+                    Click="ClearButton_Click"
+                    HorizontalAlignment="Right"
+                    Background="#4B5563"
+                    Foreground="White" />
+
+            <!-- Results -->
+            <TextBlock Text="Results:" FontWeight="Bold" />
+
+            <TextBox x:Name="ResultsBox"
+                     IsReadOnly="True"
+                     Height="200"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     FontFamily="Courier New"
+                     FontSize="12"
+                     Background="#2D2D2D"
+                     Foreground="#D1FAE5"
+                     BorderBrush="#4B5563"
+                     BorderThickness="1"
+                     Padding="8" />
+
+        </StackPanel>
+    </ScrollViewer>
+
+</Window>
