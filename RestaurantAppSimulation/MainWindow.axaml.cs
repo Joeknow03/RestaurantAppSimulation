@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 namespace RestaurantAppSimulation;
 
@@ -11,6 +12,22 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+    _server.ServingComplete += () =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                AddToResults(_server.LastCookResult);
+                AddToResults("--- Serving food ---");
+                AddToResults(_server.LastServeResult);
+                AddToResults("");
+
+                StatusLabel.Text = "Status: Done! Ready for next table.";
+                CustomerCountLabel.Text = "Customers at table: 0";
+                SendButton.IsEnabled = true;
+                ReceiveButton.IsEnabled = true;
+            });
+        };
     }
 
     private void ReceiveButton_Click(object? sender, RoutedEventArgs e)
@@ -18,11 +35,13 @@ public partial class MainWindow : Window
         try
         {
             string customerName = CustomerNameInput.Text?.Trim() ?? "";
+
             if (customerName == "")
             {
                 AddToResults("Please enter a customer name!");
                 return;
             }
+
             int chickenQty = (int)(ChickenQty.Value ?? 0);
             int eggQty = (int)(EggQty.Value ?? 0);
             string drinkChoice = GetSelectedDrink();
@@ -32,18 +51,10 @@ public partial class MainWindow : Window
 
             CustomerCountLabel.Text = "Customers at table: " + _server.GetCustomerCount();
 
-            // Reset inputs
             CustomerNameInput.Text = "";
             ChickenQty.Value = 0;
             EggQty.Value = 0;
             DrinkCombo.SelectedIndex = 0;
-            
-
-            // Show egg quality info if eggs were ordered
-            if (eggQty > 0)
-            {
-                EggQualityLabel.Text = "Egg Quality: check results (some may be hidden)";
-            }
         }
         catch (Exception ex)
         {
@@ -60,21 +71,19 @@ public partial class MainWindow : Window
                 AddToResults("No customers have ordered yet!");
                 return;
             }
-            
-            AddToResults("--- Sending to Cook (event chain starts) ---");
-             _server.Send();
 
-             AddToResults(_server.LastCookResult);
-             AddToResults("--- Serving food (triggered by Cook.Processed event) ---");
-             AddToResults(_server.LastServeResult);
-             AddToResults("");
+            SendButton.IsEnabled = false;
+            ReceiveButton.IsEnabled = false;
+            StatusLabel.Text = "Status: Cook is preparing food in background...";
 
-             CustomerCountLabel.Text = "Customers at table: 0";
-             EggQualityLabel.Text = "Egg Quality: -";
+            AddToResults("--- Sending to Cook ---");
+            _server.Send();
         }
         catch (Exception ex)
         {
             AddToResults("ERROR: " + ex.Message);
+            SendButton.IsEnabled = true;
+            ReceiveButton.IsEnabled = true;
         }
     }
 

@@ -33,10 +33,10 @@
         </Style>
     </Window.Styles>
 
-    <ScrollViewer>
+     <ScrollViewer>
         <StackPanel Margin="20" Spacing="12">
 
-            
+            <!-- Title -->
             <TextBlock Text="🍽️ My Restaurant"
                        FontSize="26"
                        FontWeight="Bold"
@@ -48,7 +48,7 @@
                     <TextBlock Text="Receive this request from a Customer"
                                FontSize="15"
                                FontWeight="Bold" />
-                    
+
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="Customer name:"
                                    VerticalAlignment="Center"
@@ -59,44 +59,32 @@
                                  Background="#3D3D3D"
                                  Foreground="White" />
                     </StackPanel>
-                    
+
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="How many chicken?"
                                    VerticalAlignment="Center"
                                    Width="160" />
                         <NumericUpDown x:Name="ChickenQty"
-                                       Value="0"
-                                       Minimum="0"
-                                       Maximum="20"
-                                       Width="100"
-                                       FormatString="0"
-                                       Background="#3D3D3D"
-                                       Foreground="White" />
+                                       Value="0" Minimum="0" Maximum="20"
+                                       Width="100" FormatString="0"
+                                       Background="#3D3D3D" Foreground="White" />
                     </StackPanel>
 
-                    <!-- Egg quantity -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="How many egg?"
                                    VerticalAlignment="Center"
                                    Width="160" />
                         <NumericUpDown x:Name="EggQty"
-                                       Value="0"
-                                       Minimum="0"
-                                       Maximum="20"
-                                       Width="100"
-                                       FormatString="0"
-                                       Background="#3D3D3D"
-                                       Foreground="White" />
+                                       Value="0" Minimum="0" Maximum="20"
+                                       Width="100" FormatString="0"
+                                       Background="#3D3D3D" Foreground="White" />
                     </StackPanel>
 
-                    <!-- Drink choice -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="Drink:"
                                    VerticalAlignment="Center"
                                    Width="160" />
-                        <ComboBox x:Name="DrinkCombo"
-                                  SelectedIndex="0"
-                                  Width="150">
+                        <ComboBox x:Name="DrinkCombo" SelectedIndex="0" Width="150">
                             <ComboBoxItem Content="Tea" />
                             <ComboBoxItem Content="Coca Cola" />
                             <ComboBoxItem Content="Pepsi" />
@@ -104,7 +92,6 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <!-- Receive button -->
                     <Button x:Name="ReceiveButton"
                             Content="➕  Receive request from Customer"
                             Click="ReceiveButton_Click"
@@ -127,15 +114,15 @@
                     Foreground="White"
                     FontSize="14" />
             
-            <Border Background="#3D3000"
-                    BorderBrush="#CA8A04"
+            <Border Background="#1E3A5F"
+                    BorderBrush="#2563EB"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="12">
-                <TextBlock x:Name="EggQualityLabel"
-                           Text="Egg Quality: -"
+                <TextBlock x:Name="StatusLabel"
+                           Text="Status: waiting for orders..."
                            FontSize="13"
-                           Foreground="#FDE68A" />
+                           Foreground="#93C5FD" />
             </Border>
 
             <!-- Clear button -->
@@ -151,7 +138,7 @@
 
             <TextBox x:Name="ResultsBox"
                      IsReadOnly="True"
-                     Height="200"
+                     Height="220"
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"

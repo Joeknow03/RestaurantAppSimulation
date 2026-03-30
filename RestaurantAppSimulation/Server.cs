@@ -1,102 +1,101 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RestaurantAppSimulation;
 
 public class Server
 {
     private TableRequests _tableRequests = new TableRequests();
-    private Cook _cook = new Cook();
+    private Cook[] _cooks = new Cook[]
+    {
+        new Cook("Cook Alice"),
+        new Cook("Cook Bob")
+    };
  
-    // Stores the result from cooking so the UI can display it
+    private object _lockObject = new object();
+    private int _nextCookIndex = 0;
     public string LastCookResult { get; private set; } = "";
     public string LastServeResult { get; private set; } = "";
-    public event EventHandler? Ready;
-    
-    public Server()
-    {
-        Ready += (sender, e) =>
-        {
-            _cook.SetRequests(_tableRequests);
-            LastCookResult = _cook.OnServerReady(sender, e);
-        };
-        
-        _cook.Processed += (sender, e) =>
-        {
-            LastServeResult = ServeFood();
-        };
-    }
+    public event Action? ServingComplete;
     
     public string Receive(string customerName, int chickenQty, int eggQty, string drinkChoice)
     {
-        // Add one Chicken object per chicken ordered
-        for (int i = 0; i < chickenQty; i++)
+        // lock: only one thread can execute this block at a time
+        lock (_lockObject)
         {
-            _tableRequests.Add<Chicken>(customerName);
+            for (int i = 0; i < chickenQty; i++)
+                _tableRequests.Add<Chicken>(customerName);
+ 
+            for (int i = 0; i < eggQty; i++)
+                _tableRequests.Add<Egg>(customerName);
+ 
+            if (drinkChoice == "Tea")         _tableRequests.Add<Tea>(customerName);
+            else if (drinkChoice == "Coca Cola") _tableRequests.Add<CocaCola>(customerName);
+            else if (drinkChoice == "Pepsi")     _tableRequests.Add<Pepsi>(customerName);
+ 
+            string drinkDisplay = drinkChoice == "No drink" ? "no drink" : drinkChoice;
+            return " " + customerName + ": " + chickenQty + " chicken, " + eggQty + " egg, " + drinkDisplay;
         }
- 
-        // Add one Egg object per egg ordered
-        for (int i = 0; i < eggQty; i++)
-        {
-            _tableRequests.Add<Egg>(customerName);
-        }
- 
-        // Add the drink
-        if (drinkChoice == "Tea")
-            _tableRequests.Add<Tea>(customerName);
-        else if (drinkChoice == "Coca Cola")
-            _tableRequests.Add<CocaCola>(customerName);
-        else if (drinkChoice == "Pepsi")
-            _tableRequests.Add<Pepsi>(customerName);
-        // "No drink" = nothing added
- 
-        string drinkDisplay = drinkChoice == "No drink" ? "no drink" : drinkChoice;
-        return " " + customerName + ": " + chickenQty + " chicken, " + eggQty + " egg, " + drinkDisplay;
     }
     
     public void Send()
     {
-        Ready?.Invoke(this, EventArgs.Empty);
+        TableRequests requestsSnapshot;
+        Cook selectedCook;
+ 
+        lock (_lockObject)
+        {
+            requestsSnapshot = _tableRequests;
+            _tableRequests = new TableRequests(); // reset for next table
+ 
+            // Round-robin: take turns between cooks
+            selectedCook = _cooks[_nextCookIndex];
+            _nextCookIndex = (_nextCookIndex + 1) % _cooks.Length;
+        }
+        
+        Task<string> cookTask = Task.Run(() =>
+        {
+            return selectedCook.Process(requestsSnapshot);
+        });
+        
+        cookTask.ContinueWith(completedCookTask =>
+        {
+            lock (_lockObject)
+            {
+                LastCookResult = completedCookTask.Result;
+                Thread.Sleep(500);
+                LastServeResult = ServeWithLinq(requestsSnapshot);
+            }
+            ServingComplete?.Invoke();
+        });
     }
-    
-    private string ServeFood()
+    // ==============================
+    private string ServeWithLinq(TableRequests requests)
     {
         string result = "";
         
-        foreach (IMenuItem item in _tableRequests)
+        List<string> sortedNames = requests.CustomerNames
+            .OrderBy(name => name)   
+            .ToList();               
+ 
+        foreach (string customerName in sortedNames)
         {
-            if (item is Drink)
-            {
-                item.Obtain(); // pour the drink
-            }
+            List<IMenuItem> items = requests[customerName];
+            int chickenCount = items.Count(item => item is Chicken);
+            int eggCount     = items.Count(item => item is Egg);
+            int drinkCount   = items.Count(item => item is Drink);
+            
+            Drink? drink = items.FirstOrDefault(item => item is Drink) as Drink;
+            if (drink != null) drink.Obtain(); 
+            result += customerName + " ordered " +
+                      drinkCount + " drink, " +
+                      eggCount + " egg and " +
+                      chickenCount + " chicken\n";
         }
-        
-        foreach (string customerName in _tableRequests.CustomerNames)
-        {
-            List<IMenuItem> items = _tableRequests[customerName];
- 
-            int chickenCount = 0;
-            int eggCount = 0;
-            string drinkName = "no drink";
- 
-            foreach (IMenuItem item in items)
-            {
-                if (item is Chicken) chickenCount++;
-                else if (item is Egg) eggCount++;
-                else if (item is Drink) drinkName = item.Name;
-            }
- 
-            result += customerName + " is served " +
-                      chickenCount + " chicken, " +
-                      eggCount + " egg, " +
-                      drinkName + "\n";
-        }
- 
         result += "Please enjoy your food!";
- 
-        // Reset for next table
-        _tableRequests = new TableRequests();
- 
         return result;
     }
  
