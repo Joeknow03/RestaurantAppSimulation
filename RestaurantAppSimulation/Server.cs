@@ -21,6 +21,11 @@ public class Server
     public string LastServeResult { get; private set; } = "";
     public event Action? ServingComplete;
     
+    private DataBaseService _db = new DataBaseService();
+    private int _currentSessionId = -1;
+    private Dictionary<string, (int chicken, int egg, string drink)> _pendingOrders
+        = new Dictionary<string, (int, int, string)>();
+    
     public string Receive(string customerName, int chickenQty, int eggQty, string drinkChoice)
     {
         // lock: only one thread can execute this block at a time
@@ -37,6 +42,7 @@ public class Server
             else if (drinkChoice == "Pepsi")     _tableRequests.Add<Pepsi>(customerName);
  
             string drinkDisplay = drinkChoice == "No drink" ? "no drink" : drinkChoice;
+            _pendingOrders[customerName] = (chickenQty, eggQty, drinkChoice);
             return " " + customerName + ": " + chickenQty + " chicken, " + eggQty + " egg, " + drinkDisplay;
         }
     }
@@ -45,6 +51,8 @@ public class Server
     {
         TableRequests requestsSnapshot;
         Cook selectedCook;
+        Dictionary<string, (int chicken, int egg, string drink)> ordersSnapshot; // ← добавь это
+        int sessionId = -1;
  
         lock (_lockObject)
         {
@@ -54,6 +62,16 @@ public class Server
             // Round-robin: take turns between cooks
             selectedCook = _cooks[_nextCookIndex];
             _nextCookIndex = (_nextCookIndex + 1) % _cooks.Length;
+            ordersSnapshot = _pendingOrders;
+            _pendingOrders = new Dictionary<string, (int, int, string)>();
+
+            _currentSessionId = _db.StartSession(selectedCook.Name);
+
+            foreach (var entry in ordersSnapshot)
+            {
+                _db.SaveCustomerOrder(_currentSessionId, entry.Key,
+                    entry.Value.chicken, entry.Value.egg, entry.Value.drink);
+            }
         }
         
         Task<string> cookTask = Task.Run(() =>
@@ -63,16 +81,38 @@ public class Server
         
         cookTask.ContinueWith(completedCookTask =>
         {
-            lock (_lockObject)
+            try  
             {
-                LastCookResult = completedCookTask.Result;
-                Thread.Sleep(500);
-                LastServeResult = ServeWithLinq(requestsSnapshot);
+                lock (_lockObject)
+                {
+                    LastCookResult = completedCookTask.Result;
+                    Thread.Sleep(500);
+
+                    int chickensCooked = requestsSnapshot.Get<Chicken>().Count;
+                    int eggsCooked = requestsSnapshot.Get<Egg>().Count;
+                    int rottenEggs = 0;
+                    foreach (string line in LastCookResult.Split('\n'))
+                    {
+                        if (line.Contains("Rotten:"))
+                        {
+                            int.TryParse(line.Split("Rotten:")[1].Trim(), out rottenEggs);
+                        }
+                    }
+
+                    _db.CompleteSession(sessionId, chickensCooked, eggsCooked, rottenEggs);
+                    LastServeResult = ServeWithLinq(requestsSnapshot);
+                }
+                ServingComplete?.Invoke();
             }
-            ServingComplete?.Invoke();
+            catch (Exception ex)
+            {
+                string innerMsg = ex.InnerException != null ? "\nInner: " + ex.InnerException.Message : "";
+                LastServeResult = "ERROR: " + ex.Message + innerMsg;
+                ServingComplete?.Invoke();
+            }
         });
     }
-    // ==============================
+    
     private string ServeWithLinq(TableRequests requests)
     {
         string result = "";
@@ -100,4 +140,5 @@ public class Server
     }
  
     public int GetCustomerCount() => _tableRequests.CustomerCount;
+    public DataBaseService GetDatabaseService() => _db;
 }

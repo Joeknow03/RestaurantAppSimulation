@@ -33,124 +33,173 @@
         </Style>
     </Window.Styles>
 
-     <ScrollViewer>
-        <StackPanel Margin="20" Spacing="12">
+     <TabControl Background="#1E1E1E">
+        <TabItem Header="🍽️ Restaurant" Foreground="White">
+            <ScrollViewer>
+                <StackPanel Margin="20" Spacing="12">
 
-            <!-- Title -->
-            <TextBlock Text="🍽️ My Restaurant"
-                       FontSize="26"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center" />
-            
-            <Border Background="#2D2D2D" CornerRadius="8" Padding="15">
-                <StackPanel Spacing="10">
+                    <TextBlock Text="🍽️ My Restaurant"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+                    
+                    <Border Background="#2D2D2D" CornerRadius="8" Padding="15">
+                        <StackPanel Spacing="10">
 
-                    <TextBlock Text="Receive this request from a Customer"
-                               FontSize="15"
-                               FontWeight="Bold" />
+                            <TextBlock Text="Receive this request from a Customer"
+                                       FontSize="15"
+                                       FontWeight="Bold" />
 
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="Customer name:"
-                                   VerticalAlignment="Center"
-                                   Width="160" />
-                        <TextBox x:Name="CustomerNameInput"
-                                 Width="180"
-                                 Watermark="e.g. Dilshod"
-                                 Background="#3D3D3D"
-                                 Foreground="White" />
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="Customer name:"
+                                           VerticalAlignment="Center"
+                                           Width="160" />
+                                <TextBox x:Name="CustomerNameInput"
+                                         Width="180"
+                                         Watermark="e.g. Dilshod"
+                                         Background="#3D3D3D"
+                                         Foreground="White" />
+                            </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="How many chicken?"
-                                   VerticalAlignment="Center"
-                                   Width="160" />
-                        <NumericUpDown x:Name="ChickenQty"
-                                       Value="0" Minimum="0" Maximum="20"
-                                       Width="100" FormatString="0"
-                                       Background="#3D3D3D" Foreground="White" />
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="How many chicken?"
+                                           VerticalAlignment="Center"
+                                           Width="160" />
+                                <NumericUpDown x:Name="ChickenQty"
+                                               Value="0" Minimum="0" Maximum="20"
+                                               Width="100" FormatString="0"
+                                               Background="#3D3D3D" Foreground="White" />
+                            </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="How many egg?"
-                                   VerticalAlignment="Center"
-                                   Width="160" />
-                        <NumericUpDown x:Name="EggQty"
-                                       Value="0" Minimum="0" Maximum="20"
-                                       Width="100" FormatString="0"
-                                       Background="#3D3D3D" Foreground="White" />
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="How many egg?"
+                                           VerticalAlignment="Center"
+                                           Width="160" />
+                                <NumericUpDown x:Name="EggQty"
+                                               Value="0" Minimum="0" Maximum="20"
+                                               Width="100" FormatString="0"
+                                               Background="#3D3D3D" Foreground="White" />
+                            </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="Drink:"
-                                   VerticalAlignment="Center"
-                                   Width="160" />
-                        <ComboBox x:Name="DrinkCombo" SelectedIndex="0" Width="150">
-                            <ComboBoxItem Content="Tea" />
-                            <ComboBoxItem Content="Coca Cola" />
-                            <ComboBoxItem Content="Pepsi" />
-                            <ComboBoxItem Content="No drink" />
-                        </ComboBox>
-                    </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="Drink:"
+                                           VerticalAlignment="Center"
+                                           Width="160" />
+                                <ComboBox x:Name="DrinkCombo" SelectedIndex="0" Width="150">
+                                    <ComboBoxItem Content="Tea" />
+                                    <ComboBoxItem Content="Coca Cola" />
+                                    <ComboBoxItem Content="Pepsi" />
+                                    <ComboBoxItem Content="No drink" />
+                                </ComboBox>
+                            </StackPanel>
 
-                    <Button x:Name="ReceiveButton"
-                            Content="➕  Receive request from Customer"
-                            Click="ReceiveButton_Click"
+                            <Button x:Name="ReceiveButton"
+                                    Content="➕  Receive request from Customer"
+                                    Click="ReceiveButton_Click"
+                                    HorizontalAlignment="Stretch"
+                                    Background="#16A34A"
+                                    Foreground="White" />
+
+                            <TextBlock x:Name="CustomerCountLabel"
+                                       Text="Customers at table: 0"
+                                       Foreground="#9CA3AF" />
+
+                        </StackPanel>
+                    </Border>
+                    
+                    <Button x:Name="SendButton"
+                            Content="📨  Send all Customer requests to the Cook"
+                            Click="SendButton_Click"
                             HorizontalAlignment="Stretch"
-                            Background="#16A34A"
+                            Background="#D97706"
+                            Foreground="White"
+                            FontSize="14" />
+                    
+                    <Border Background="#1E3A5F"
+                            BorderBrush="#2563EB"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12">
+                        <TextBlock x:Name="StatusLabel"
+                                   Text="Status: waiting for orders..."
+                                   FontSize="13"
+                                   Foreground="#93C5FD" />
+                    </Border>
+                    
+                    <Border Background="#1A3A1A"
+                            BorderBrush="#16A34A"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12">
+                        <TextBlock x:Name="DbStatusLabel"
+                                   Text="🗄️ Database: connecting..."
+                                   FontSize="12"
+                                   Foreground="#86EFAC" />
+                    </Border>
+                    
+                    <Button x:Name="ClearButton"
+                            Content="🗑️  Clear Results"
+                            Click="ClearButton_Click"
+                            HorizontalAlignment="Right"
+                            Background="#4B5563"
                             Foreground="White" />
+                    
+                    <TextBlock Text="Results:" FontWeight="Bold" />
 
-                    <TextBlock x:Name="CustomerCountLabel"
-                               Text="Customers at table: 0"
-                               Foreground="#9CA3AF" />
+                    <TextBox x:Name="ResultsBox"
+                             IsReadOnly="True"
+                             Height="180"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             FontFamily="Courier New"
+                             FontSize="12"
+                             Background="#2D2D2D"
+                             Foreground="#D1FAE5"
+                             BorderBrush="#4B5563"
+                             BorderThickness="1"
+                             Padding="8" />
 
                 </StackPanel>
-            </Border>
-            
-            <Button x:Name="SendButton"
-                    Content="📨  Send all Customer requests to the Cook"
-                    Click="SendButton_Click"
-                    HorizontalAlignment="Stretch"
-                    Background="#D97706"
-                    Foreground="White"
-                    FontSize="14" />
-            
-            <Border Background="#1E3A5F"
-                    BorderBrush="#2563EB"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="12">
-                <TextBlock x:Name="StatusLabel"
-                           Text="Status: waiting for orders..."
-                           FontSize="13"
-                           Foreground="#93C5FD" />
-            </Border>
+            </ScrollViewer>
+        </TabItem>
+         
+        <TabItem Header="📋 History" Foreground="White">
+            <StackPanel Margin="20" Spacing="12">
 
-            <!-- Clear button -->
-            <Button x:Name="ClearButton"
-                    Content="🗑️  Clear Results"
-                    Click="ClearButton_Click"
-                    HorizontalAlignment="Right"
-                    Background="#4B5563"
-                    Foreground="White" />
+                <TextBlock Text="📋 Session History"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center" />
 
-            <!-- Results -->
-            <TextBlock Text="Results:" FontWeight="Bold" />
+                <Button x:Name="RefreshHistoryButton"
+                        Content="🔄  Refresh History"
+                        Click="RefreshHistoryButton_Click"
+                        HorizontalAlignment="Left"
+                        Background="#7C3AED"
+                        Foreground="White" />
 
-            <TextBox x:Name="ResultsBox"
-                     IsReadOnly="True"
-                     Height="220"
-                     TextWrapping="Wrap"
-                     AcceptsReturn="True"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     FontFamily="Courier New"
-                     FontSize="12"
-                     Background="#2D2D2D"
-                     Foreground="#D1FAE5"
-                     BorderBrush="#4B5563"
-                     BorderThickness="1"
-                     Padding="8" />
+                <TextBlock x:Name="HistoryCountLabel"
+                           Text="Sessions in database: 0"
+                           Foreground="#9CA3AF" />
 
-        </StackPanel>
-    </ScrollViewer>
+                <TextBox x:Name="HistoryBox"
+                         IsReadOnly="True"
+                         Height="520"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         FontFamily="Courier New"
+                         FontSize="12"
+                         Background="#2D2D2D"
+                         Foreground="#D1FAE5"
+                         BorderBrush="#4B5563"
+                         BorderThickness="1"
+                         Padding="8" />
+
+            </StackPanel>
+        </TabItem>
+
+    </TabControl>
 
 </Window>
