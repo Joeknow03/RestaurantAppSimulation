@@ -48,70 +48,67 @@ public class Server
     }
     
     public void Send()
+{
+    TableRequests requestsSnapshot;
+    Cook selectedCook;
+    Dictionary<string, (int chicken, int egg, string drink)> ordersSnapshot;
+    int sessionId = -1;
+
+    lock (_lockObject)
     {
-        TableRequests requestsSnapshot;
-        Cook selectedCook;
-        Dictionary<string, (int chicken, int egg, string drink)> ordersSnapshot; // ← добавь это
-        int sessionId = -1;
- 
-        lock (_lockObject)
+        requestsSnapshot = _tableRequests;
+        _tableRequests = new TableRequests();
+
+        selectedCook = _cooks[_nextCookIndex];
+        _nextCookIndex = (_nextCookIndex + 1) % _cooks.Length;
+
+        ordersSnapshot = _pendingOrders;
+        _pendingOrders = new Dictionary<string, (int, int, string)>();
+        sessionId = _db.StartSession(selectedCook.Name);
+
+        foreach (var entry in ordersSnapshot)
         {
-            requestsSnapshot = _tableRequests;
-            _tableRequests = new TableRequests(); // reset for next table
- 
-            // Round-robin: take turns between cooks
-            selectedCook = _cooks[_nextCookIndex];
-            _nextCookIndex = (_nextCookIndex + 1) % _cooks.Length;
-            ordersSnapshot = _pendingOrders;
-            _pendingOrders = new Dictionary<string, (int, int, string)>();
-
-            _currentSessionId = _db.StartSession(selectedCook.Name);
-
-            foreach (var entry in ordersSnapshot)
-            {
-                _db.SaveCustomerOrder(_currentSessionId, entry.Key,
-                    entry.Value.chicken, entry.Value.egg, entry.Value.drink);
-            }
+            _db.SaveCustomerOrder(sessionId, entry.Key,
+                entry.Value.chicken, entry.Value.egg, entry.Value.drink);
         }
-        
-        Task<string> cookTask = Task.Run(() =>
-        {
-            return selectedCook.Process(requestsSnapshot);
-        });
-        
-        cookTask.ContinueWith(completedCookTask =>
-        {
-            try  
-            {
-                lock (_lockObject)
-                {
-                    LastCookResult = completedCookTask.Result;
-                    Thread.Sleep(500);
-
-                    int chickensCooked = requestsSnapshot.Get<Chicken>().Count;
-                    int eggsCooked = requestsSnapshot.Get<Egg>().Count;
-                    int rottenEggs = 0;
-                    foreach (string line in LastCookResult.Split('\n'))
-                    {
-                        if (line.Contains("Rotten:"))
-                        {
-                            int.TryParse(line.Split("Rotten:")[1].Trim(), out rottenEggs);
-                        }
-                    }
-
-                    _db.CompleteSession(sessionId, chickensCooked, eggsCooked, rottenEggs);
-                    LastServeResult = ServeWithLinq(requestsSnapshot);
-                }
-                ServingComplete?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                string innerMsg = ex.InnerException != null ? "\nInner: " + ex.InnerException.Message : "";
-                LastServeResult = "ERROR: " + ex.Message + innerMsg;
-                ServingComplete?.Invoke();
-            }
-        });
     }
+
+    Task<string> cookTask = Task.Run(() =>
+    {
+        return selectedCook.Process(requestsSnapshot);
+    });
+
+    cookTask.ContinueWith(completedCookTask =>
+    {
+        try
+        {
+            lock (_lockObject)
+            {
+                LastCookResult = completedCookTask.Result;
+                Thread.Sleep(500);
+
+                int chickensCooked = requestsSnapshot.Get<Chicken>().Count;
+                int eggsCooked = requestsSnapshot.Get<Egg>().Count;
+                int rottenEggs = 0;
+                foreach (string line in LastCookResult.Split('\n'))
+                {
+                    if (line.Contains("Rotten:"))
+                        int.TryParse(line.Split("Rotten:")[1].Trim(), out rottenEggs);
+                }
+                
+                _db.CompleteSession(sessionId, chickensCooked, eggsCooked, rottenEggs);
+                LastServeResult = ServeWithLinq(requestsSnapshot);
+            }
+            ServingComplete?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            string innerMsg = ex.InnerException != null ? "\nInner: " + ex.InnerException.Message : "";
+            LastServeResult = "ERROR (sessionId=" + sessionId + "): " + ex.Message + innerMsg;
+            ServingComplete?.Invoke();
+        }
+    });
+}
     
     private string ServeWithLinq(TableRequests requests)
     {
